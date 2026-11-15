@@ -1,52 +1,62 @@
-# Recurrent Neural Network Time Series Forecasting with Dynamic Lag Identification
-Initialization:
+# Neural time-series prediction: historical exploratory notebook
 
-The code starts by importing the necessary libraries:
+[Time series prediction - RNN .ipynb](Time%20series%20prediction%20-%20RNN%20.ipynb)
+contains SimpleRNN, dense-network and LSTM examples, a lagged-window constructor,
+and a lag-product plot.
 
-collections: Used for creating a deque object to store data for dynamic finding.
-numpy: Used for numerical operations.
-pandas: Used for reading and manipulating data.
-keras: Used for building and training RNN models.
-sklearn: Used for data preprocessing and splitting.
-matplotlib: Used for plotting the autocorrelation function.
-Dynamic finding:
+## Implemented workflow
 
-The dynamic_finding function takes a time series data set as input and uses its autocorrelation function to identify the appropriate lag for forecasting. The function takes the following arguments:
+The notebook reads `Data.xlsx`, scales the full series to [-1, 1], constructs
+25-value windows, randomly assigns 70%/30% of windows to training/test, and trains
+each network for 100 epochs with batch size 5. The test partition is also passed
+as validation data during training. The plot helper does not return or select a
+lag: the actual window length is fixed at 25.
 
-data: The time series data set.
-max_lag: The maximum lag to consider. If not specified, it defaults to the length of the data set minus 1.
-th: The threshold value for determining the autocorrelation cutoff point.
-mode: The mode of calculation, either 'unbiased' or 'biased'.
-The function calculates the autocorrelation of the data at each lag and stores it in a deque. It then flips the deque and appends the autocorrelation values to the end of the deque. Finally, it plots the autocorrelation function, draws two horizontal lines at the threshold values, and shows the plot.
+## Reproducibility and interpretation
 
-Sequence generation:
+- `Data.xlsx` is absent, and its source, schema, rights and measurement units are
+  not documented. The recorded results cannot currently be reproduced.
+- Scaling uses the full series before splitting, and overlapping windows are
+  randomly split. This does not constitute a clean chronological forecast test.
+- The recurrent input shape is `(samples, 1, 25)`: one recurrent time step with
+  25 features, rather than 25 sequential recurrent steps.
+- The lag calculation uses uncentered products without variance normalization.
+  Its `biased`/`unbiased` denominator labels are reversed relative to the usual
+  convention; it should not be described as automatic validated lag selection.
+- Later plotting cells hard-code 1,116 test observations. Seeds, an exact
+  environment and a separate final test interval are not recorded.
 
-The sequence_making function creates sequences of data points from the original time series data set. The function takes the following arguments:
+The saved losses are historical outputs, not validated out-of-time forecasting
+accuracy. A corrected study needs an authorized dataset, a chronological split,
+training-only preprocessing, separate validation/test intervals, explicit tensor
+semantics, and comparison with simple forecasting baselines.
 
-sequence: The original time series data set.
-n_step: The number of data points in each sequence.
-The function iterates through the data set, creating a sequence of n_step data points for each time step. It appends the sequence to two deques: X and y. X stores the sequences of data points, and y stores the corresponding values at the next time step.
+## Inspect the original
 
-Data loading:
+```bash
+jupyter notebook 'Time series prediction - RNN .ipynb'
+```
 
-The code reads the time series data set from an Excel file named Data.xlsx. It then scales the data using MinMaxScaler to a range of -1 to 1.
+Imports use NumPy, pandas, Keras, scikit-learn and Matplotlib. Jupyter and an Excel
+reader compatible with the original pandas version are also needed. The Keras
+backend/version and Excel engine were not captured, so no tested installation
+command or replacement dataset is asserted.
 
-Examine dynamic finding:
+## Reproducibility status
 
-The code calls the dynamic_finding function to identify the appropriate lag for forecasting. It sets the threshold value to 0.6.
+The original notebook and its saved outputs are retained as historical evidence.
+The notebook metadata records Python 3.7.9, but no exact dependency lockfile or
+random seed was committed. The original numerical outputs have not been
+reproduced by the November 2026 documentation audit. Installing current packages
+does not reproduce the historical environment.
 
-Test train splitting:
+This is an exploratory educational example on one dataset. It does not establish
+general algorithm superiority or clinical validity. No paper or preprint is
+claimed for this repository.
 
-The code divides the data into training and testing sets using scikit-learn's train_test_split function. It sets the test size to 30% of the data set.
+## Attribution and reuse
 
-Modeling using vanilla recurrent neural network:
-
-The code builds a vanilla RNN model using Keras. The model consists of two layers:
-
-A SimpleRNN layer with 10 units and tanh activation.
-A Dense layer with a single unit and linear activation for the output prediction.
-The model is compiled using the Adam optimizer, mean squared error (MSE) as the loss function, and MSE as the metric for evaluating the model's performance.
-
-Fitting the model:
-
-The code trains the RNN model on the training data. It sets the number of epochs to 100, the batch size to 5, and uses the validation data to monitor the model's performance.
+Repository maintained by Saeid Jamali. The original algorithms and datasets belong
+to their respective authors. No license file is present; this documentation
+revision does not grant a new software or data license. See Git history for the
+original notebook and earlier descriptions.
